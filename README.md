@@ -41,6 +41,29 @@ answer-engine probe); without a key it falls back to a deterministic heuristic
 so the tool is always demoable (results flagged `estimated`). Runs standalone —
 no Supabase tables required.
 
+### SEER import (Relationalseo)
+
+Where the engine *estimates* signal scores, **SEER** (Schieler DeLand's
+Relationalseo tool) provides *measured* data. Paste a SEER export into the
+"Import SEER data" panel on `/authority` (or POST a `seerData` field to the
+scan API) and:
+
+- SEER's measured scores **override** the engine's estimate for any signal they
+  cover; uncovered signals keep the engine's read-out.
+- An optional `weights` block **recalibrates** the Authority Index — provided
+  weights are renormalized so the effective weights still sum to 100.
+- Signals driven by SEER are tagged `SEER` in the report; source precedence is
+  visible per signal.
+
+The expected export shape is documented in `lib/authority/seer.js`
+(`SEER_SCHEMA_DOC`) with a full example in `docs/seer-import-example.json`. The
+importer is forgiving: it accepts canonical signal keys or common aliases (e.g.
+`reviews`, `citations`, `backlinks`), both flat (`{ "review_corpus": 88 }`) and
+rich (`{ "review_corpus": { "score": 88, "measured": "...", "gap": "..." } }`)
+shapes, and reports unrecognized fields as warnings rather than guessing.
+**Note:** SEER's real field names still need confirming with Schieler — update
+the alias map in `seer.js` once they're known.
+
 ## Setup
 1. Clone repo
 2. Copy `.env.local.example` to `.env.local` and fill in your keys

@@ -22,6 +22,26 @@ const PRIORITY_STYLE = {
   Compounding: { color: '#6d28d9', bg: '#ede9fe' },
 };
 
+const SEER_EXAMPLE = JSON.stringify(
+  {
+    source: 'SEER',
+    business: 'Summit Plumbing Co.',
+    signals: {
+      review_corpus: { score: 88, measured: '412 reviews · 4.8★ · 22 new in 30d' },
+      editorial_mentions: { score: 34, measured: '1 local roundup, no press' },
+      content_authority: { score: 61 },
+      citation_consistency: { score: 79, measured: 'NAP consistent on 41/47 directories' },
+      credentials_trust: { score: 90, measured: 'License CO #12345, NATE + EPA certified' },
+      structured_entity: { score: 55, measured: 'GBP complete; schema missing on 8 pages' },
+      sentiment_differentiators: { score: 48 },
+      engagement_signals: { score: 30, measured: 'Owner responds to ~15% of reviews' },
+    },
+    weights: { review_corpus: 26, editorial_mentions: 18, credentials_trust: 14 },
+  },
+  null,
+  2
+);
+
 const SCAN_STEPS = [
   'Generating the queries real buyers ask AI engines…',
   'Simulating how answer engines rank your category…',
@@ -37,6 +57,7 @@ export default function AuthorityRadar() {
     location: '',
     website: '',
     notes: '',
+    seerData: '',
   });
   const [scanning, setScanning] = useState(false);
   const [stepIdx, setStepIdx] = useState(0);
@@ -182,6 +203,11 @@ function IntakeForm({ form, update, runScan, error }) {
           />
         </div>
 
+        <SeerImport
+          value={form.seerData}
+          onChange={(v) => update('seerData', v)}
+        />
+
         {error && <div className="ar-error">{error}</div>}
 
         <button type="submit" className="btn btn-primary ar-scan-btn">
@@ -192,6 +218,54 @@ function IntakeForm({ form, update, runScan, error }) {
           queries across 8 authority signals. Takes ~10 seconds.
         </p>
       </form>
+    </div>
+  );
+}
+
+function SeerImport({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const has = value && value.trim().length > 0;
+  return (
+    <div className={`ar-seer ${has ? 'has-data' : ''}`}>
+      <button
+        type="button"
+        className="ar-seer-toggle"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span className="ar-seer-title">
+          <span className="ar-seer-dot" /> Import SEER data
+          <span className="ar-seer-sub">
+            Relationalseo · measured signals override estimates {has ? '· loaded' : '· optional'}
+          </span>
+        </span>
+        <span className="ar-seer-chevron">{open ? '▾' : '▸'}</span>
+      </button>
+      {open && (
+        <div className="ar-seer-body">
+          <p className="ar-seer-help">
+            Paste a SEER export (JSON). Measured scores replace the engine’s estimates for the
+            signals they cover, and any <code>weights</code> recalibrate the Authority Index.
+            Unrecognized fields are reported, never guessed.
+          </p>
+          <textarea
+            className="ar-seer-textarea"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder='{ "source": "SEER", "signals": { "review_corpus": { "score": 88 } }, "weights": { "review_corpus": 26 } }'
+            spellCheck={false}
+          />
+          <div className="ar-seer-actions">
+            <button type="button" className="ar-seer-link" onClick={() => onChange(SEER_EXAMPLE)}>
+              Load example
+            </button>
+            {has && (
+              <button type="button" className="ar-seer-link" onClick={() => onChange('')}>
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -226,7 +300,9 @@ function Results({ result, onReset }) {
     topPicks,
     recommendedCount,
     roadmap,
+    seer,
   } = result;
+  const seerCovered = seer?.coveredSignals || [];
 
   return (
     <div className="ar-results">
@@ -248,6 +324,22 @@ function Results({ result, onReset }) {
           Estimated read-out — running without a live AI key, so scores are derived from the
           framework and the details you provided. Add <code>ANTHROPIC_API_KEY</code> for a live
           answer-engine probe.
+        </div>
+      )}
+
+      {seer?.applied && (
+        <div className="ar-note seer">
+          <strong>SEER-calibrated.</strong> Measured data from SEER (Relationalseo) is driving{' '}
+          {seerCovered.length} of {signals.length} signals
+          {seer.calibratedWeights ? ' and recalibrating the signal weights' : ''}. Those signals are
+          tagged <span className="ar-src-tag seer">SEER</span> below.
+          {seer.warnings?.length > 0 && (
+            <div className="ar-seer-warnings">
+              {seer.warnings.map((w, i) => (
+                <div key={i}>⚠ {w}</div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -396,6 +488,7 @@ function SignalRow({ s }) {
         <div className="ar-signal-name">
           {s.label}
           <span className="ar-signal-weight">weight {s.weight}</span>
+          {s.source === 'seer' && <span className="ar-src-tag seer">SEER</span>}
         </div>
         <div className="ar-signal-score" style={{ color: barColor }}>
           {s.score}

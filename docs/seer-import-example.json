@@ -1,0 +1,28 @@
+{
+  "source": "SEER",
+  "business": "Summit Plumbing Co.",
+  "_comment": "Shape Authority Radar expects for a SEER (Relationalseo) export. Map your real SEER fields to these canonical signal keys, or use a known alias (see lib/authority/seer.js ALIASES). Scores are 0-100. Any subset of signals is fine. `weights` is optional and recalibrates the Authority Index; partial weights are renormalized to sum 100.",
+  "signals": {
+    "review_corpus": {
+      "score": 88,
+      "measured": "412 reviews across Google/Yelp/Angi · 4.8★ avg · 22 new in last 30 days",
+      "gap": "Yelp count trails Google 6:1 — diversify review sources"
+    },
+    "editorial_mentions": {
+      "score": 34,
+      "measured": "Named in 1 local roundup; no press mentions found",
+      "gap": "No independent editorial source engines can cite"
+    },
+    "content_authority": { "score": 61, "measured": "12 service pages, thin FAQ, no cost guides" },
+    "citation_consistency": { "score": 79, "measured": "NAP consistent on 41/47 directories" },
+    "credentials_trust": { "score": 90, "measured": "License CO #12345, insured, NATE + EPA certified, 10-yr warranty" },
+    "structured_entity": { "score": 55, "measured": "GBP complete; LocalBusiness schema missing on 8 pages" },
+    "sentiment_differentiators": { "score": 48, "measured": "'on-time' theme strong; pricing sentiment mixed" },
+    "engagement_signals": { "score": 30, "measured": "Owner responds to ~15% of reviews" }
+  },
+  "weights": {
+    "review_corpus": 26,
+    "editorial_mentions": 18,
+    "credentials_trust": 14
+  }
+}
