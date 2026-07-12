@@ -26,17 +26,19 @@ const SEER_EXAMPLE = JSON.stringify(
   {
     source: 'SEER',
     business: 'Summit Plumbing Co.',
-    signals: {
-      review_corpus: { score: 88, measured: '412 reviews · 4.8★ · 22 new in 30d' },
-      editorial_mentions: { score: 34, measured: '1 local roundup, no press' },
-      content_authority: { score: 61 },
-      citation_consistency: { score: 79, measured: 'NAP consistent on 41/47 directories' },
-      credentials_trust: { score: 90, measured: 'License CO #12345, NATE + EPA certified' },
-      structured_entity: { score: 55, measured: 'GBP complete; schema missing on 8 pages' },
-      sentiment_differentiators: { score: 48 },
-      engagement_signals: { score: 30, measured: 'Owner responds to ~15% of reviews' },
+    tools: {
+      EntityOS: { score: 72, measured: 'Entity resolved; sameAs sparse' },
+      DiagnosticOS: { score: 58, measured: 'Local-intent classifier under-firing' },
+      DriftOS: { score: 64 },
+      PageOS: { score: 61 },
+      RewriteOS: { score: 55 },
+      VisionOS: { score: 40, measured: '3 hero images flagged AI-generated' },
+      BacklinkOS: { score: 48 },
+      CredentialOS: { score: 90, measured: 'License CO #12345, NATE + EPA' },
+      GBPOS: { score: 77 },
     },
-    weights: { review_corpus: 26, editorial_mentions: 18, credentials_trust: 14 },
+    classifiers: { review_velocity: 42, nap_consistency: 80 },
+    weights: { external_reputation: 15, local_spatial: 15 },
   },
   null,
   2
@@ -215,7 +217,7 @@ function IntakeForm({ form, update, runScan, error }) {
         </button>
         <p className="ar-fineprint">
           Probes {form.category === 'roofing' || form.category === 'landscaping' ? 6 : 7} buyer
-          queries across 8 authority signals. Takes ~10 seconds.
+          queries across SEER’s 12 classifier categories (205 classifiers). Takes ~10 seconds.
         </p>
       </form>
     </div>
@@ -243,15 +245,16 @@ function SeerImport({ value, onChange }) {
       {open && (
         <div className="ar-seer-body">
           <p className="ar-seer-help">
-            Paste a SEER export (JSON). Measured scores replace the engine’s estimates for the
-            signals they cover, and any <code>weights</code> recalibrate the Authority Index.
+            Paste a SEER export (JSON) — OS-tool scores (EntityOS, GBPOS…), category scores, or
+            individual classifier scores. SEER’s measured data replaces the engine’s estimate for
+            every signal it covers, and any <code>weights</code> recalibrate the Authority Index.
             Unrecognized fields are reported, never guessed.
           </p>
           <textarea
             className="ar-seer-textarea"
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            placeholder='{ "source": "SEER", "signals": { "review_corpus": { "score": 88 } }, "weights": { "review_corpus": 26 } }'
+            placeholder='{ "source": "SEER", "tools": { "EntityOS": 72, "GBPOS": { "score": 80 } }, "weights": { "local_spatial": 15 } }'
             spellCheck={false}
           />
           <div className="ar-seer-actions">
@@ -331,8 +334,20 @@ function Results({ result, onReset }) {
         <div className="ar-note seer">
           <strong>SEER-calibrated.</strong> Measured data from SEER (Relationalseo) is driving{' '}
           {seerCovered.length} of {signals.length} signals
-          {seer.calibratedWeights ? ' and recalibrating the signal weights' : ''}. Those signals are
-          tagged <span className="ar-src-tag seer">SEER</span> below.
+          {seer.calibratedWeights ? ' and recalibrating the signal weights' : ''}.
+          {(seer.toolsUsed?.length > 0 || seer.classifiersUsed > 0) && (
+            <span>
+              {' '}Rolled up from
+              {seer.toolsUsed?.length > 0 && ` ${seer.toolsUsed.length} OS tool${seer.toolsUsed.length > 1 ? 's' : ''} (${seer.toolsUsed.join(', ')})`}
+              {seer.classifiersUsed > 0 && `${seer.toolsUsed?.length ? ' and' : ''} ${seer.classifiersUsed} classifier score${seer.classifiersUsed > 1 ? 's' : ''}`}.
+            </span>
+          )}{' '}
+          SEER-driven signals are tagged <span className="ar-src-tag seer">SEER</span> below.
+          {seer.competitorContext && (
+            <div className="ar-seer-warnings" style={{ color: '#4338ca' }}>
+              CompetitorScope context received (not scored into the index).
+            </div>
+          )}
           {seer.warnings?.length > 0 && (
             <div className="ar-seer-warnings">
               {seer.warnings.map((w, i) => (
@@ -387,8 +402,8 @@ function Results({ result, onReset }) {
       <section className="ar-section">
         <h2 className="ar-h2">Authority signal scorecard</h2>
         <p className="ar-section-sub">
-          The eight signals AI engines weigh, scored for your business. Higher-weight signals move
-          your ranking the most.
+          SEER’s 12 classifier categories, scored for your business. Higher-weight categories move
+          your ranking the most; the count is how many underlying SEER classifiers feed each one.
         </p>
         <div className="ar-signals">
           {signals.map((s) => (
@@ -488,6 +503,9 @@ function SignalRow({ s }) {
         <div className="ar-signal-name">
           {s.label}
           <span className="ar-signal-weight">weight {s.weight}</span>
+          {s.classifierCount != null && (
+            <span className="ar-signal-weight">{s.classifierCount} classifiers</span>
+          )}
           {s.source === 'seer' && <span className="ar-src-tag seer">SEER</span>}
         </div>
         <div className="ar-signal-score" style={{ color: barColor }}>

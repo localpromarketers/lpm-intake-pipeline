@@ -21,48 +21,57 @@ Perplexity, Google AI Overviews) use to decide which home-services business to
 recommend — and maps a client's path from "shows up once" to "the go-to
 recommendation in its category."
 
+The signal model is grounded in **SEER** (Schieler DeLand / Relationalseo): its
+**12 classifier categories**, **9 diagnostic OS tools**, and **205 named
+classifiers** are captured as data in `lib/authority/seer-taxonomy.js`. Those
+12 categories ARE Authority Radar's signals, so the tool speaks SEER's language
+end-to-end.
+
 Enter a business (name, category, city, optional website + what's already true
 about it) and it:
 1. Generates the buyer-intent queries real customers ask answer engines
    (best-overall, emergency, transparent-pricing, trust/credentials, etc.).
 2. Assesses whether the business would be surfaced — top pick, mentioned, or
    invisible — for each query.
-3. Scores the business across **8 weighted authority signals** (review corpus,
-   editorial mentions, content authority, citation consistency, credentials,
-   structured entity, sentiment differentiators, engagement) into a single
-   **Authority Index** and tier (Invisible → Emerging → Contender → Go-To
-   Authority).
+3. Scores the business across the **12 weighted authority signals** (Identity &
+   Entity, Local & Spatial, Trust & Credentials, Content Utility, Linguistic
+   Authenticity, Visual Intelligence, External Reputation, Link Authority,
+   Technical Infra, Integrity Risk, Behavioral Validation, Temporal Dynamics)
+   into a single **Authority Index** and tier (Invisible → Emerging → Contender
+   → Go-To Authority). Each signal shows how many SEER classifiers feed it.
 4. Produces a prioritized roadmap (Quick Win / Foundational / Compounding) to
    raise the index and win the queries that matter.
 
-The signal framework and buyer-query templates live in `lib/authority/`. The
-analysis runs on the Anthropic API when `ANTHROPIC_API_KEY` is set (a live
-answer-engine probe); without a key it falls back to a deterministic heuristic
-so the tool is always demoable (results flagged `estimated`). Runs standalone —
-no Supabase tables required.
+The framework and buyer-query templates live in `lib/authority/`. The analysis
+runs on the Anthropic API when `ANTHROPIC_API_KEY` is set (a live answer-engine
+probe); without a key it falls back to a deterministic heuristic so the tool is
+always demoable (results flagged `estimated`). Runs standalone — no Supabase
+tables required.
 
 ### SEER import (Relationalseo)
 
-Where the engine *estimates* signal scores, **SEER** (Schieler DeLand's
-Relationalseo tool) provides *measured* data. Paste a SEER export into the
-"Import SEER data" panel on `/authority` (or POST a `seerData` field to the
-scan API) and:
+Where the engine *estimates* signal scores, SEER provides *measured* data. Paste
+a SEER export into the "Import SEER data" panel on `/authority` (or POST a
+`seerData` field to the scan API). SEER can report at three granularities and
+the importer rolls **any mix** of them up into the 12 signals + the Authority
+Index:
 
-- SEER's measured scores **override** the engine's estimate for any signal they
-  cover; uncovered signals keep the engine's read-out.
-- An optional `weights` block **recalibrates** the Authority Index — provided
-  weights are renormalized so the effective weights still sum to 100.
-- Signals driven by SEER are tagged `SEER` in the report; source precedence is
-  visible per signal.
+- **OS-tool scores** — `{ "tools": { "EntityOS": 72, "GBPOS": { "score": 80 } } }`.
+  A tool's score is distributed across the categories it diagnoses, weighted by
+  how many of that category's classifiers the tool evaluates (derived from the
+  taxonomy, so it can't drift).
+- **Category scores** — `{ "categories": { "local_spatial": 66 } }` (direct).
+- **Classifier scores** — `{ "classifiers": { "review_velocity": 42 } }`, rolled
+  into that classifier's category.
+- **Weights** — `{ "weights": { "external_reputation": 15 } }` recalibrates the
+  index (renormalized to sum 100).
 
-The expected export shape is documented in `lib/authority/seer.js`
-(`SEER_SCHEMA_DOC`) with a full example in `docs/seer-import-example.json`. The
-importer is forgiving: it accepts canonical signal keys or common aliases (e.g.
-`reviews`, `citations`, `backlinks`), both flat (`{ "review_corpus": 88 }`) and
-rich (`{ "review_corpus": { "score": 88, "measured": "...", "gap": "..." } }`)
-shapes, and reports unrecognized fields as warnings rather than guessing.
-**Note:** SEER's real field names still need confirming with Schieler — update
-the alias map in `seer.js` once they're known.
+SEER's measured data **overrides** the engine's estimate for every signal it
+covers (tagged `SEER` in the report); uncovered signals keep the engine's
+read-out. `CompetitorScope` / `SERP Overlap` / `ChatGPT-OS` are accepted as
+context (not scored). Unrecognized fields are reported as warnings, never
+guessed. Full shape in `lib/authority/seer.js` (`SEER_SCHEMA_DOC`) and
+`docs/seer-import-example.json`.
 
 ## Setup
 1. Clone repo
