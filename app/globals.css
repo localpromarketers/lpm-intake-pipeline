@@ -1110,3 +1110,55 @@ tbody tr:last-child td {
 }
 
 .ar-src-tag.seer { background: #ede9fe; color: #5b21b6; }
+
+/* Classifier drag chips */
+.ar-drag {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--gray-200);
+}
+
+.ar-drag-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--red-600);
+  margin-bottom: 8px;
+}
+
+.ar-drag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ar-drag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 5px 10px;
+}
+
+.ar-drag-score {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--red-600);
+  min-width: 20px;
+  text-align: center;
+}
+
+.ar-drag-name { font-size: 13px; font-weight: 600; color: var(--gray-700); }
+
+.ar-drag-tools {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-left: 1px solid #fecaca;
+  padding-left: 8px;
+}

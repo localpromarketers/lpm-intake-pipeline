@@ -22,7 +22,10 @@
   "classifiers": {
     "review_velocity": 42,
     "nap_consistency": 80,
-    "thin_city_pages": 35
+    "thin_city_pages": 35,
+    "geographic_authority": 38,
+    "team_photo_uniqueness": 30,
+    "proper_noun_density": 44
   },
 
   "weights": {

@@ -37,7 +37,14 @@ const SEER_EXAMPLE = JSON.stringify(
       CredentialOS: { score: 90, measured: 'License CO #12345, NATE + EPA' },
       GBPOS: { score: 77 },
     },
-    classifiers: { review_velocity: 42, nap_consistency: 80 },
+    classifiers: {
+      review_velocity: 42,
+      nap_consistency: 80,
+      thin_city_pages: 35,
+      geographic_authority: 38,
+      team_photo_uniqueness: 30,
+      proper_noun_density: 44,
+    },
     weights: { external_reputation: 15, local_spatial: 15 },
   },
   null,
@@ -523,6 +530,24 @@ function SignalRow({ s }) {
       {s.gap && (
         <div className="ar-signal-detail">
           <span className="ar-signal-tag gap">Gap</span> {s.gap}
+        </div>
+      )}
+      {s.weakClassifiers?.length > 0 && (
+        <div className="ar-drag">
+          <div className="ar-drag-label">SEER classifiers dragging this down</div>
+          <div className="ar-drag-chips">
+            {s.weakClassifiers.map((c) => (
+              <div
+                key={c.id}
+                className="ar-drag-chip"
+                title={c.tools?.length ? `Evaluated by ${c.tools.join(', ')}` : c.name}
+              >
+                <span className="ar-drag-score">{c.score}</span>
+                <span className="ar-drag-name">{c.name}</span>
+                {c.tools?.length > 0 && <span className="ar-drag-tools">{c.tools.join(' · ')}</span>}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
