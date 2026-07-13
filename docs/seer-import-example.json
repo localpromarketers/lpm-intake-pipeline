@@ -1,0 +1,36 @@
+{
+  "source": "SEER",
+  "business": "Summit Plumbing Co.",
+  "_comment": "SEER (Relationalseo) export shape for Authority Radar. Provide any mix of OS-tool scores, direct category scores, and individual classifier scores (0-100). Everything is rolled up into the 12 authority signals and the Authority Index. `weights` optionally recalibrates the index (category ids; renormalized to sum 100). See lib/authority/seer-taxonomy.js for the full 9 tools / 12 categories / 205 classifiers.",
+
+  "tools": {
+    "EntityOS": { "score": 72, "measured": "Entity resolved; sameAs links sparse", "gap": "Add Organization schema + sameAs to certifying bodies" },
+    "DiagnosticOS": { "score": 58, "measured": "Local-intent + helpful-content classifiers under-firing" },
+    "DriftOS": { "score": 64, "measured": "Service dilution drift toward generalist" },
+    "PageOS": { "score": 61, "measured": "On-page integrity ok; thin city pages flagged" },
+    "RewriteOS": { "score": 55, "measured": "Elevated cliché density, low technical precision" },
+    "VisionOS": { "score": 40, "measured": "3 hero images flagged AI-generated; stock watermark on 1" },
+    "BacklinkOS": { "score": 48, "measured": "Few entity-validating local links" },
+    "CredentialOS": { "score": 90, "measured": "License CO #12345, NATE + EPA, BBB accredited" },
+    "GBPOS": { "score": 77, "measured": "Profile complete; review velocity decelerating" }
+  },
+
+  "categories": {
+    "local_spatial": 66
+  },
+
+  "classifiers": {
+    "review_velocity": 42,
+    "nap_consistency": 80,
+    "thin_city_pages": 35,
+    "geographic_authority": 38,
+    "team_photo_uniqueness": 30,
+    "proper_noun_density": 44
+  },
+
+  "weights": {
+    "external_reputation": 15,
+    "local_spatial": 15,
+    "trust_credentials": 14
+  }
+}

@@ -19,6 +19,26 @@ export default function Home() {
 
   return (
     <div className="intake-container" style={{ paddingTop: 60 }}>
+      <div style={{ textAlign: 'right', marginBottom: 8 }}>
+        <a
+          href="/authority"
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#15803d',
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 12px',
+            border: '1px solid #dcfce7',
+            borderRadius: 999,
+            background: '#f0fdf4',
+          }}
+        >
+          ◎ Authority Radar — see how AI engines rank you
+        </a>
+      </div>
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>🚀</div>
         <h1 style={{ fontSize: 32, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
