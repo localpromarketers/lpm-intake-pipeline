@@ -447,7 +447,9 @@ export default function PenFest() {
         </div>
       </footer>
 
-      <style>{`
+      {/* dangerouslySetInnerHTML avoids a hydration mismatch: React escapes
+          quotes in server-rendered <style> text children. */}
+      <style dangerouslySetInnerHTML={{ __html: `
         .pf {
           font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           background: ${C.paper};
@@ -701,7 +703,7 @@ export default function PenFest() {
           .pf-timeline-item { grid-template-columns: 62px 24px 1fr; }
           .pf-form-card { padding: 22px; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }
