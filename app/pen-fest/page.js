@@ -7,7 +7,7 @@ import { useState } from 'react';
 const EVENT = {
   name: 'Chesapeake Stationery & Pen Fest',
   tagline: 'The Bay’s celebration of fine pens, ink, and paper.',
-  dates: 'October 17–18, 2026',
+  dates: 'October 16–17, 2027',
   daysShort: 'Sat & Sun',
   hours: '10:00 AM – 5:00 PM',
   venue: 'Havre de Grace Community Center',
@@ -443,7 +443,7 @@ export default function PenFest() {
           </div>
         </div>
         <div className="pf-footer-fine">
-          © 2026 {EVENT.name}. Dates and details subject to change — sign up to get confirmed news first.
+          © 2027 {EVENT.name}. Dates and details subject to change — sign up to get confirmed news first.
         </div>
       </footer>
 
